@@ -143,12 +143,22 @@ head(cmdf)
 
 ```{r}
 tidy_cmdf <- charlestonManumissions %>%
-  unnest_tokens(word, text)
+  unnest_tokens(word, comments)
 
 tidy_cmdf
 ```
+#Rename columns
+```{r}
+rename(charlestonManumissions, Transcript ="Notes...Quotes")
+```
 
 #Topic Models Library standalone
+```{r}
+tidy_meta <- charlestonManumissions %>%
+  unnest_tokens(charlestonManumissions, transcript) %>% 
+  filter(str_detect(word, "[a-z']$")) %>% 
+  anti_join(stop_words)
+```
 
 ```{r}
 library(topicmodels)
@@ -168,6 +178,10 @@ data(charlestonManumissions)
 
 ```{r}
 terms <- Terms(charlestonManumissions)
+head(terms)
+```
+```{r}
+terms <- Terms(charlestonManumissions, comments)
 head(terms)
 ```
 
@@ -578,11 +592,19 @@ CM.dtm <- tidy_cm_new_metadata.freq_words %>%
 cm.lda <- LDA(CM.dtm, k = 5, control = list(seed = 12345))
 cm.lda
 ```
+#Try again
+```{r}
+# set a seed so that the output of the model is predictable
+cm_lda <- LDA(charlestonManumissions, k = 2, control = list(seed = 12345))
+
+cm_lda
+#> A LDA_VEM topic model with 2 topics.
+```
 
 #Matrix #ERROR
 
 ```{r}
-cm.topics <- tidy(CM.lda, matrix = "beta")
+cm.topics <- tidy(cm.lda, matrix = "beta")
 head(CM.topics)
 ```
 
@@ -662,3 +684,111 @@ digcom.identifier mead/34 digcom.identifier.contextkey 12357724\
 digcom.identifier.submissionpath mead/34 digcom.type dataset dspace.entity.type Dataset relation.isAuthorOfDataset 9a464e77-e79b-4013-b5ca-95514ab4863a\
 relation.isAuthorOfDataset.latestForDiscovery 9a464e77-e79b-4013-b5ca-95514ab4863a\
 upenn.schoolDepartmentCenter The Magazine of Early American Datasets (MEAD)
+
+```{r}
+cm_meta.topics <- tidy(charlestonmanumissions.lda, matrix = "beta")
+cm_meta.topics
+```
+
+```{r}
+library(leaflet)
+my.map <- leaflet()
+my.map
+
+```
+```{r}
+my.map %>% addTiles()
+```
+
+```{r}
+my.map %>% addTiles() %>% addMarkers(lng=-82.836856, lat=34.678286, popup = "Hardin 004")
+```
+
+```{r}
+my.map %>% addTiles() %>% addMarkers(lng=-79.955, lat= 32.8000278, popup = "Denmark Vesey Statue")
+```
+
+
+```{r}
+addMarkers(lng=-79.9411, lat=32.7822, popup = "Denmark Vesey House")
+```
+
+```{r}
+read.csv(CM_Map)
+```
+### Leaflet
+
+In recent years Leaflet has become the most popular open source Javascript library for mapping. In comparison to `ggplot()` the advantage of leaflet is its interactivity. It allows you to zoom in, have pop ups, etc. While `ggplot()` is a powerful tool for static maps and would be useful for a book or journal article, leaflet would make a useful addition to an online digital component.
+
+Like `ggplot()` it works by layering information on top of a basemap. You begin by loading the library and invoking leaflet. 
+
+```{r}
+library(leaflet)
+my.map <- leaflet()
+my.map
+```
+Now that we've got a leaflet object created, we can add layers to it starting with a basemap. 
+
+```{r}
+my.map %>% addTiles()
+```
+Leaflet refers to tiles - these are sort of like base maps. Next we need to add coordinates. In this example, lets use the coordinates for Dr. Regan's office. 
+
+```{r}
+my.map %>% addTiles() %>% addMarkers(lng=-82.836856, lat=34.678286, popup = "Hardin 004")
+```
+
+We could also do this with a data frame. Notice that in this example, we use the leaflet function and call the data inside rather than passing the function coordinates manually. We then use the paste function to build out text for a pop up.
+
+```{r}
+leaflet(data=rec.data.coordinates) %>% addTiles() %>% addMarkers(~longitude, ~latitude, popup = paste("The total expenditures in ", rec.data.coordinates$city, ", ", rec.data.coordinates$state, " were ",  rec.data.coordinates$total_expenditures, sep=""))
+```
+
+```{r}
+leaflet(data=CM_Map) %>% addTiles() %>% addMarkers(~Longitude, ~Latitude, popup = paste("The total expenditures in ", " were ", sep=""))
+```
+
+
+(@) Use leaflet to map a dataset of your choice: 
+#My Choice
+
+```{r}
+leaflet(data=undergroundRR.coordinates) %>% addTiles() %>% addMarkers(~longitude, ~latitude, popup = paste("The total expenditures in ", undergroundRR.coordinates$city, ", ", undergroundRR.coordinates$state, " were ",  undergroundRR.coordinates$total_expenditures, sep=""))
+```
+
+(@) Explain what choices you made in building this map? Why might you use leaflet over ggplot? When would ggplot be more desirable? 
+```{r}
+leaflet(df) %>% addTiles() %>%
+  addCircleMarkers(Lon = ~Lon, Lat = ~Lat, 
+             popup = ~Place)
+```
+```{r}
+df = structure(list(Lat = c(19.877263, 20.2602939, 30.7194022, 13.0801721, 
+11.0018115, 27.4844597, 16.2915189, 17.3887859, 22.5677459, 15.8309251, 
+9.9256493), Lon = c(75.3390241, 85.8394548, 76.7646552, 80.2838331, 
+76.9628425, 94.9019447, 80.4541588, 78.4610647, 88.3476023, 78.0425373, 
+78.1228866), Place = structure(1:11, .Label = c("Aurangabad", 
+"Bhubaneshwar", "Chandigarh", "Chennai", "Coimbatore", "Dibrugarh", 
+"Guntur", "Hyderabad", "Kolkata", "Kurnool", "Madurai"), class = "factor"), 
+    People = c(1L, 2L, 23L, 25L, 2L, 1L, 1L, 4L, 7L, 1L, 1L)), class = "data.frame", row.names = c(NA, 
+-11L))
+```
+
+```{r}
+df = structure(list(Lat = c(19.877263, 20.2602939, 30.7194022, 13.0801721, 
+11.0018115, 27.4844597, 16.2915189, 17.3887859, 22.5677459, 15.8309251, 
+9.9256493), Lon = c(75.3390241, 85.8394548, 76.7646552, 80.2838331, 
+76.9628425, 94.9019447, 80.4541588, 78.4610647, 88.3476023, 78.0425373, 
+78.1228866), Place = structure(1:11, .Label = c("Aurangabad", 
+"Bhubaneshwar", "Chandigarh", "Chennai", "Coimbatore", "Dibrugarh", 
+"Guntur", "Hyderabad", "Kolkata", "Kurnool", "Madurai"), class = "factor"), 
+    People = c(1L, 2L, 23L, 25L, 2L, 1L, 1L, 4L, 7L, 1L, 1L)) class = "data.frame" row.names = c(NA -11L))
+```
+
+```{r}
+cm_df =structure(list(Lon=c(-79.9411, -79.9375, -79.9331, -79.9314, -79.9308, -79.9308, -79.9292, -79.93, -79.9272, -79.955)), Lat=c(32.78220, 32.78440, 32.78720, 32.78030, 32.77610, 32.7761, 32.7772, 32.77920, 32.77530, 32.80028)), place =c("Denmark Vesey House", "College of Charleston", "Emanuel African Methodist Episcopal Church", "Market Hall and Sheds", "Powder Magazine", "StMichael Episcopal Church", "Old Slave Mart", "StPhilips Episcopal Church", "Exchange and Provost", "Denmark Vesey Monument"))class = "factor"), 
+    People = c(1L, 2L, 23L, 25L, 2L, 1L, 1L, 4L, 7L, 1L, 1L)) class = "data.frame" = c(NA -11L))
+```
+```{r}
+
+```
