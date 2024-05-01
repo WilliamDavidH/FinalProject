@@ -1,0 +1,160 @@
+---
+title: "2024_May_1_WDH"
+author: "Will Hiott"
+format: html
+editor: visual
+---
+
+## Charleston Manumissions
+
+![](images/Clogner_427.jpg)
+
+## RCode
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+## The history of the United States has often portrayed as a melding pot of immigrants from various lands that came together to establish a new nation creating a birth story as old as the country itself. Yet the complexities of the land, in this scenario, overlooked or avoided much of the past 250 to 500 years both the indigenous peoples who had occupied the continent for millennia and those forced into bondage. 
+
+Enslavement would have its roots in all of the American colonies and territories. While the abolitionist movement begins for the most part in the Northern colonies, currents of the process of freeing or manumission of the enslaved occurred up and down the east coast. Slavery studies over since the 1980s have brought to life the horrors of the peculiar institution. For the past forty years, historians have gleaned information from WPA slave narratives, biographies of the enslaved themselves, or more traditional sources of census records, plantation ledgers, travel accounts, and historical archaeology resources. 
+
+One African American group of individuals that is even more complex are those who had been manumitted or were born free. The role of the free person of color in the colonial era, revolutionary period and antebellum years varied greatly from colony or state to state. Historians’ role is to make some collective ideas as part of the interpretation. That is the task that I will attempt to do as part of an analysis of the Charleston Manumissions data set. 
+
+What is the dataset? How was it made? Who constructed it? What were the sources? Where does it live today?
+
+```{r}
+library(tidyverse)
+library(DigitalMethodsData)
+library(lubridate)
+library(dplyr)
+library(leaflet)
+library(tidytext)
+library(tidyverse)
+library(readtext)
+library(tm)
+library(topicmodels)library(tidyverse)
+library(tidytext) 
+library(readtext)
+library(widyr)
+library(SnowballC)
+library(ggplot2) 
+library(tidyverse)
+library(DigitalMethodsData)
+```
+
+ 
+
+```{r}
+library(DigitalMethodsData)
+data("charlestonManumissions")
+head(charlestonManumissions)
+```
+
+```{r}
+tail(charlestonManumissions)
+```
+
+T
+
+```{r}
+tidy_charlestonManumissions <-
+charlestonManumissions %>%
+  separate(
+           Date,
+           into = c("Day", "Month", "Year"),
+           convert = TRUE
+           )
+```
+
+```{r}
+head(tidy_charlestonManumissions)
+```
+
+```{r}
+head(charlestonManumissions$"Notes...Quotes")
+```
+
+```         
+```
+
+The Charleston Manumissions dataset was accumulated from records kept in the city of Charleson, South Carolina between 1776-1800. The archival records themselves exist today and are maintained by the South Carolina Department of Archives and History in the South Carolina State Archives in Columbia, South Carolina. The Charleston Manumissions dataset was part of a research project by then Ph.D. student Dr. John Garrison Marks who subsequently received his doctorate from Rice University. His dissertation was recently published by the University of South Carolina Press under the title of Black Freedom in the Age of Slavery: Race, Status, and Identity in the Urban Americas. 
+
+Dr. John Marks utilized various digital history tools, but primarily looked upon the Charleston Manumissions dataset as a means to aggregate the documents, with a name, date, prior owner. The comparing and contrasting of a free Black community are more of an examination of similarities and differences between Charleston and Cartagena, Columbia. A few similar examples of class in churches in Charleson included attendance at St. Phillips in a white community and an interconnection establishment of free black church related organizations and civic and social groups. Certainly, the African Methodist Episcopal church was a pivotal influence. 
+
+Likewise, it is somewhat surprising that the study of Charleston Manumissions did not zero in of a gentleman who is listed in the Charleston Manumissions Volume 3Mpage as 427a man owned by Mary Clodner on December 7, 1799. One unique distinction was that that man had an interesting first name of Telemarque he would later be called Denmark and he would take as a surname the ship’s captain that has first brough him from St. Thomas the Dutch Colony 
+
+The Charleston Manumission is a succinct dataset housed in the Magazine of Early American Datasets MEAD datasets in the digital library of the University of Pennsylvania. It was one of the sample datasets loaded in “DigitalMethodsData” for Digital Methods II. 
+
+Methodologies: 
+
+The Charleston Manumissions dataset is comprised of 271 entries in the corpus which is composed of the six columns from left to right: Name, Race, Owner, Motive, Date, Volume, Page, Notes…Quotes, X, X.1. The two last pages may be an unavoidable spillover of the Notes…Quotes column from Excel to csv. For the most part these two columns are filled with NA. The most useful information may be in locating the originals through the SCDAH Book, Page Number, Motive, and in what is essentially a comment column the transcribed text of the Manumission itself collectively entitled “Notes...Quotes.” In R Studio I was able to use the separate function to split the Date into three columns to make it more tidy data as Day, Month, and Year 
+
+So why is this a collective dataset? The primary reason is that between 1776 and 1800 Charleston Manumissions were recorded in an archival collection by the office in Charleston that recorded the legal documents by book and page numbers. One column that does not exist is a value or cost in the case of self-purchase. While an analysis of people to dollars is often a dehumanizing process, it could also offer some insight into the manumission itself, as noted later. Secondly, such quantification would need to analyze at least three currencies noted from guineas, pounds and dollars. Finally, I am conflicted to likewise to utilize an exchange calculator to convert 1800 dollars into 2024. Yet again the nonitizize of an enslaved dehumanizes, but are there clues to the capitalism of slavery in doing so. 
+
+Mapping of the Charleston Manumissions dataset is hard to do. Unfortunately, there are no street addresses available in the archival documents themselves. Perhaps there would be someway to correlate the owners name to a Charleston city directory, United States Federal Census data from 1790 and/or 1800, or other documentation either governmental or elsewhere, such as church records, for example. In lieu, of having actual coordinates of longitude and latitude, I sought to map prominent historic sites in Charleston utilizing the coordinates in the National Register of Historic Places nomination forms recorded on a statewide level in the South Carolina Department of Archives and Histories, State Historic Preservation Office listings. One of those maps utilizing the mapping software Leaflet. 
+
+```{r}
+library(leaflet)
+my.map <- leaflet()
+my.map
+```
+
+```{r}
+charlestonManumissions %>% 
+    select(Name, Race) %>%
+    group_by(Race) %>%
+    summarize(count = n())
+```
+
+```{r}
+charlestonManumissions %>% 
+    select(Owner, Motive) %>%
+    group_by(Motive) %>%
+    summarize(count = n())
+```
+
+Topic Modeling was the initial intent of the analysis. One of the most successful codes was a simple count by Race. Of the 271 individuals some 138 were described as Black, 75 were Mulatto, other terms were mestizo, mestizo, moor, mustee or mustizoe. Spellings of all words are inconsistent in the corpus which made me wonder if it might be appropriate to run through a simple spell check in Word to aid in building consistency, without destroying historical terminology. R Studio effectively broke out the motivations of the 271 documents. The top motivation was moral at 145, followed by self-purchase at 55 individuals, outside purchase 17 people, followed by combinations of moral and purchase. 
+
+![](images/Word%20Cloud.jpg)
+
+```{r}
+library(leaflet)
+my.map <- leaflet()
+my.map
+```
+
+```{r}
+my.map %>% addTiles()
+```
+
+```{r}
+my.map %>% addTiles() %>% addMarkers(lng=-79.955, lat= 32.8000278, popup = "Denmark Vesey Statue")
+```
+
+Using Voyant the corpus was read the entirety of the text of the Charleston Manumissions which formed 19,432 total words and some 2,135 unique word forms. The data was broken down into the most frequent word in the corpus as follows: 
+
+named (303); said (268); free (236); set (181); negro (168); slavery (151); woman (149); charleston (146); consideration (144); manumitted (136); paid (115); slave (112); mulatto (107); sum (106); john (97); hand (96); good (94); forever (82); pounds (81); causes (80); shillings (78); discharged (75); city (75); man (74); manner (73); bondage (72); divers (71); enfranchised (69); presents (68); years (64); sterling (63); moving (62); manumit (62); money (61); whatsoever (59); william (54); negroe (54); considerations (53); certain (52); state (51); aforesaid (48); wench (47); 
+
+freedom (47); released (45); james (44); services (41); daughter (41); boy (40); charles (38); children (37); thomas (36); merchant (35); hereunto (35); thereunto (34); bond (34); servitude (32); mary (32); child (31); st (30) 
+
+The corresponding Word Cloud illustrates that the individual’s name space and prominent words that are are woman, manumitted, Charleston, slavery and mulatto. 
+
+![](images/clipboard-3813169906.png)Conclusions: 
+
+The institution of slavery in United States history is a complex narrative of an abhorrent activity. Through studying manumission records, provides insight following the American revolution when freedom was dispensed to some formerly enslaved. It is intriguing that there was a vibrant free Black community in a Black majority state and in the eastern seaboard port city through which scores of Africans would disembark from the middle passage to slavery’s Ellis Island. 
+
+Of those 271 names in the one stands out particularly that of Telemarque. With lottery winnings he had wanted to purchase freedom. Because of his complexion and prior servitude, he felt more at home with friends who were still enslaved of the artisan class. He was not at home in the mulatto free community comprised of free offspring prominent white individuals. 
+
+Denmark, who had grown up as a cabin boy on a on a seafaring schooner. He had served as a boat captain during the American Revolution, a role another Black South Carolinian would hold during the Civil War in the person of Robert Smalls as the captain of the Planter. For his service in other former colonies, his military service might have provided his freedom. He was familiar with the world to a greater extent than other enslaved including the Haitian Revolution. 
+
+Using Digital Methodologies has abilities to look at large number of primary sources and to do manipulation that draws conclusions.
